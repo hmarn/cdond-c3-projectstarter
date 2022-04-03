@@ -14,7 +14,6 @@ jobs:
             cd ./frontend
             pwd
             node --version
-            sudo npm install -g
             npm --version
             sudo npm install
             npm run build
@@ -36,7 +35,6 @@ jobs:
             cd ./backend
             pwd
             node --version
-            sudo npm install -g
             npm --version
             sudo npm install
             npm run build
@@ -57,7 +55,6 @@ jobs:
             cd ./frontend
             pwd
             node --version
-            sudo npm install -g
             npm --version
             sudo npm install
             npm run test
@@ -75,12 +72,11 @@ jobs:
             cd ./backend
             pwd
             node --version
-            sudo npm install -g
             npm --version
             sudo npm install
             npm run test
 
-  scan-frontend:
+  analyze-frontend:
     docker:
       - image: cimg/node:12.16
     steps:
@@ -88,17 +84,16 @@ jobs:
       - restore_cache:
           key: frontend-build-{{ checksum "./frontend/package-lock.json" }}
       - run:
-          name: Scan front-end
+          name: Analyze front-end
           command: |
             cd ./frontend
             pwd
             node --version
-            sudo npm install -g
             npm --version
             sudo npm install
-            npm audit
+            sudo npm audit fix --audit-level=critical
 
-  scan-backend:
+  analyze-backend:
     docker:
       - image: cimg/node:12.16
     steps:
@@ -106,15 +101,14 @@ jobs:
       - restore_cache:
           key: backend-build-{{ checksum "./backend/package-lock.json" }}
       - run:
-          name: Scan back-end
+          name: Analyze back-end
           command: |
             cd ./backend
             pwd
             node --version
-            sudo npm install -g
             npm --version
             sudo npm install
-            npm audit
+            sudo npm audit fix --audit-level=critical 
 
 workflows:
   default:
@@ -125,8 +119,8 @@ workflows:
           requires: [build-frontend]
       - test-backend:
           requires: [build-backend]
-      - scan-frontend:
-          requires: [test-frontend]
-      - scan-backend:
-          requires: [test-backend]
+      - analyze-frontend:
+          requires: [build-frontend]
+      - analyze-backend:
+          requires: [build-backend]
 
