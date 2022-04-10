@@ -150,13 +150,11 @@ jobs:
             aws cloudformation \
             list-exports --query "Exports[?Name==\`PipelineID\`].Value" \
             --no-paginate --output text > ~/project/.circleci/ansible/inventory.txt
+      - run: yum install -y tar gzip
       - persist_to_workspace:
-          root: ~/
+          root: ~/project/.circleci/ansible/
           paths:
-            - project/.circleci/ansible/inventory.txt
-      # - run:
-      #     name: Test failure
-      #     command: return 1
+            - inventory.txt
       - destroy-environment
 
   configure-infrastructure:
@@ -168,7 +166,7 @@ jobs:
           fingerprints:
             - "b6:c0:27:6d:7d:d9:81:53:cf:bc:d3:b7:da:f4:fe:11"
       - attach_workspace:
-          at: ~/
+          at: ~/project/.circleci/ansible/
       - run:
           name: Install dependencies
           command: |
