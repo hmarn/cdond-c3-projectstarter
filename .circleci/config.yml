@@ -169,7 +169,8 @@ jobs:
             - "b6:c0:27:6d:7d:d9:81:53:cf:bc:d3:b7:da:f4:fe:11"
       - run:
           name: Installing Tar
-          command: yum install -y tar gzip
+          command: |
+              yum install -y tar gzip
       - attach_workspace:
           at: ~/project/.circleci/ansible/
       - run:
