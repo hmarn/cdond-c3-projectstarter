@@ -4,7 +4,7 @@ orbs:
   aws-cli: circleci/aws-cli@2.1.0
 
 commands:
-  destroy_environment:
+  destroy-environment:
       steps:
         - run:
             name: Destroy environments
@@ -135,7 +135,7 @@ jobs:
               --template-file .circleci/files/backend.yml \
               --tags project=udapeople \
               --stack-name stack-create-backend-${CIRCLE_WORKFLOW_ID:0:7} \
-              --parameter-overrides ID="backend-${CIRCLE_WORKFLOW_ID:0:7}"  
+              --parameter-overrides ID="backend-${CIRCLE_WORKFLOW_ID:0:7}"
       - run:
           name: Ensure front-end infrastructure exist
           command: |
@@ -143,7 +143,7 @@ jobs:
               --template-file .circleci/files/frontend.yml \
               --tags project=udapeople \
               --stack-name stack-create-frontend-${CIRCLE_WORKFLOW_ID:0:7} \
-              --parameter-overrides ID="frontend-${CIRCLE_WORKFLOW_ID:0:7}"  
+              --parameter-overrides ID="frontend-${CIRCLE_WORKFLOW_ID:0:7}"
       - run:
           name: Add back-end ip to ansible inventory
           command: |
@@ -154,29 +154,32 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      - run:
-          name: Test failure
-          command: return 1
-      - destroy_environment
+      # - run:
+      #     name: Test failure
+      #     command: return 1
+      - destroy-environment
 
-  # configure-infrastructure:
-  #   docker:
-  #     # Docker image here that supports Ansible
-  #   steps:
-  #     # Checkout code from git
-  #     # Add ssh keys with fingerprint
-  #     # attach workspace
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           # Your code here
-  #           exit 1
-  #     - run:
-  #         name: Configure server
-  #         command: |
-  #           # Your code here
-  #           exit 1
-  #     # Here's where you will add some code to rollback on failure  
+  configure-infrastructure:
+    docker:
+      - image: amazon/aws-clis
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "b6:c0:27:6d:7d:d9:81:53:cf:bc:d3:b7:da:f4:fe:11"
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible
+      - run:
+          name: Configure server
+          command: |
+              cd ~/project/.circleci/ansible/
+              ansible-playbook -i inventory.txt configure-server.yml
+      # Here's where you will add some code to rollback on failure  
+
 
 workflows:
   default:
@@ -196,6 +199,6 @@ workflows:
           filters:
             branches:
               only: [test-feature-branch]
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
 
