@@ -2,6 +2,7 @@ version: 2.1
 
 orbs: 
   aws-cli: circleci/aws-cli@2.1.0
+  slack: circleci/slack@4.1
 
 commands:
   destroy-environment:
@@ -12,6 +13,18 @@ commands:
             command: |
               aws cloudformation delete-stack --stack-name stack-create-backend-${CIRCLE_WORKFLOW_ID:0:7}
               aws cloudformation delete-stack --stack-name stack-create-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+
+  notify_slack_error:
+    steps:
+      - slack/notify:
+          event: fail
+          template: basic_fail_1
+
+  notify_slack_pass:
+    steps:
+      - slack/notify:
+          event: pass
+          template: basic_success_1
 
 jobs:
   build-frontend:
@@ -25,15 +38,13 @@ jobs:
           name: Build front-end
           command: |
             cd ./frontend
-            pwd
-            node --version
-            npm --version
             sudo npm install
             npm run build
       - save_cache:
           paths: [./frontend/node_modules]
           key: frontend-build-{{ checksum "./frontend/package-lock.json" }}
-      
+      - notify_slack_error
+      - notify_slack_pass
 
   build-backend:
     docker:
@@ -46,14 +57,13 @@ jobs:
           name: Build back-end
           command: |
             cd ./backend
-            pwd
-            node --version
-            npm --version
             sudo npm install
             npm run build
       - save_cache:
           paths: [./backend/node_modules]
           key: backend-build-{{ checksum "./backend/package-lock.json" }}
+      - notify_slack_error
+      - notify_slack_pass
 
   test-frontend:
     docker:
@@ -66,12 +76,11 @@ jobs:
           name: Test front-end
           command: |
             cd ./frontend
-            pwd
-            node --version
-            npm --version
             sudo npm install
             npm run test
-                
+      - notify_slack_error
+      - notify_slack_pass
+         
   test-backend:
     docker:
       - image: cimg/node:12.16
@@ -83,11 +92,10 @@ jobs:
           name: Test back-end
           command: |
             cd ./backend
-            pwd
-            node --version
-            npm --version
             sudo npm install
             npm run test
+      - notify_slack_error
+      - notify_slack_pass
 
   analyze-frontend:
     docker:
@@ -100,11 +108,11 @@ jobs:
           name: Analyze front-end
           command: |
             cd ./frontend
-            pwd
-            node --version
-            npm --version
             sudo npm install
-            sudo npm audit fix --audit-level=critical
+            npm audit fix --audit-level=critical --force
+            npm audit --audit-level=critical
+      - notify_slack_error
+      - notify_slack_pass
 
   analyze-backend:
     docker:
@@ -117,11 +125,11 @@ jobs:
           name: Analyze back-end
           command: |
             cd ./backend
-            pwd
-            node --version
-            npm --version
             sudo npm install
-            sudo npm audit fix --audit-level=critical  
+            npm audit fix --audit-level=critical --force
+            npm audit --audit-level=critical
+      - notify_slack_error
+      - notify_slack_pass
 
   deploy-infrastructure:
     docker:
@@ -158,11 +166,12 @@ jobs:
           paths:
             - inventory.txt
       - destroy-environment
+      - notify_slack_error
+      - notify_slack_pass
 
   configure-infrastructure:
     docker:
       - image: amazon/aws-cli
-      - image: python:3.7-alpine3.11
     steps:
       - checkout
       - add_ssh_keys:
@@ -175,18 +184,19 @@ jobs:
       - attach_workspace:
           at: ~/project/.circleci/ansible/
       - run:
-          name: Install dependencies
+          name: Install Ansible
           command: |
-            apk update && apk add --no-cache musl-dev libffi-dev openssl-dev make gcc python py2-pip python-dev
-            pip install cffi
-            pip install ansible
+              yum -y install python3 python3-pip
+              pip3 install ansible
+              ansible --version | grep "python version"
       - run:
           name: Configure server
           command: |
               cd ~/project/.circleci/ansible/
               ansible-playbook -i inventory.txt configure-server.yml
+      - notify_slack_error
+      - notify_slack_pass
       # Here's where you will add some code to rollback on failure  
-
 
 workflows:
   default:
@@ -201,11 +211,11 @@ workflows:
           requires: [build-frontend]
       - analyze-backend:
           requires: [build-backend]
-      - deploy-infrastructure:
-          requires: [test-frontend, test-backend, analyze-frontend, analyze-backend]
-          filters:
-            branches:
-              only: [test-feature-branch]
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
+      # - deploy-infrastructure:
+      #     requires: [test-frontend, test-backend, analyze-frontend, analyze-backend]
+      #     filters:
+      #       branches:
+      #         only: [test-feature-branch]
+      # - configure-infrastructure:
+      #     requires: [deploy-infrastructure]
 
