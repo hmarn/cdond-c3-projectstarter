@@ -166,8 +166,8 @@ jobs:
           paths:
             - inventory.txt
       - destroy-environment
-      - notify_slack_error
-      - notify_slack_pass
+      # - notify_slack_error
+      # - notify_slack_pass
 
   configure-infrastructure:
     docker:
@@ -194,8 +194,8 @@ jobs:
           command: |
               cd ~/project/.circleci/ansible/
               ansible-playbook -i inventory.txt configure-server.yml
-      - notify_slack_error
-      - notify_slack_pass
+      # - notify_slack_error
+      # - notify_slack_pass
       # Here's where you will add some code to rollback on failure  
 
 workflows:
