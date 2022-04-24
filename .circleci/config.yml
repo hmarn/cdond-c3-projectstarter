@@ -194,6 +194,7 @@ jobs:
           command: |
               cd ~/project/.circleci/ansible/
               ansible-playbook -i inventory.txt configure-server.yml
+      - destroy-environment    
       # - notify_slack_error
       # - notify_slack_pass
       # Here's where you will add some code to rollback on failure  
@@ -219,50 +220,74 @@ jobs:
               then
                   curl https://kvdb.io/YBMGekKxb6oqKJi39EV2vR/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
               fi
+      - destroy-environment
 
   deploy-frontend:
     docker:
       - image: amazon/aws-cli
     steps:
       - checkout
-      # - attach_workspace:
-      #     at: ~/project/.circleci/ansible/
+      - attach_workspace:
+          at: ~/project/.circleci/ansible/
+      - restore_cache:
+          key: backend-build-{{ checksum "./backend/package-lock.json" }}            
       - run:
-          name: Install Python
+          name: Install dependencies
           command: |
-              cd ./frontend
-              pwd
-      - run:        
-          name: Install Ansible
-          command: |
-              pwd
+            apt-get update && sudo apt-get install -yy less
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
       - run:
-          name: Install Node, NPM
+          name: Installing Tar
           command: |
-              pwd
+            yum install -y tar gzip
+      - run:
+          name: Get backend url
+          workding_directory: ./frontend
+          command: |
+            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters Name=instance-state-name,Values=running --output text)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "API_URL = ${API_URL}"
+            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            cat frontend/.env
+      - run:
+          name: Deploy frontend objects
+          command: |
+            cd frontend
+            npm i
+            npm run build
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      - persist_to_workspace:
+          root: .
+          paths:
+            - frontend/dist
+      - destroy-environment
+      # Here's where you will add some code to rollback on failure  
       
 
 workflows:
   default:
     jobs:
-      # - build-frontend
-      # - build-backend
-      # - test-frontend:
-      #     requires: [build-frontend]
-      # - test-backend:
-      #     requires: [build-backend]
-      # - analyze-frontend:
-      #     requires: [build-frontend]
-      # - analyze-backend:
-      #     requires: [build-backend]
-      # - deploy-infrastructure:
-      #     requires: [test-frontend, test-backend, analyze-frontend, analyze-backend]
-      #     filters:
-      #       branches:
-      #         only: [test-feature-branch]
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
-      # - run-migrations:
-      #     requires: [configure-infrastructure]
-      - deploy-frontend
-          # requires: [configure-infrastructure]
+      - build-frontend
+      - build-backend
+      - test-frontend:
+          requires: [build-frontend]
+      - test-backend:
+          requires: [build-backend]
+      - analyze-frontend:
+          requires: [build-frontend]
+      - analyze-backend:
+          requires: [build-backend]
+      - deploy-infrastructure:
+          requires: [test-frontend, test-backend, analyze-frontend, analyze-backend]
+          filters:
+            branches:
+              only: [test-feature-branch]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
+      - run-migrations:
+          requires: [configure-infrastructure]
+      - deploy-frontend:
+          requires: [configure-infrastructure]
