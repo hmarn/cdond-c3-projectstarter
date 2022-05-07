@@ -30,16 +30,20 @@
     production: yes
     state: present
 
-- name: Creates directory
-  file:
-    path: ~/web
-    state: directory
-
-- name: Copy index test page
-  template:
-    src: "files/index.js"
-    dest: "~/web/index.js"
+- name: Copy backend files
+  become: true
+  copy:
+    src: backend.tar.gz
+    dest: /home/ubuntu/backend.tar.gz
 
 - name: Executing node
   shell: |
+    cd /home/ubuntu/
+    tar xzvf backend.tar.gz
+    cd backend
+    sudo npm install -g npm@latest
+    sudo npm install -g webpack-dev-server
+    sudo npm install
+    sudo npm run build
+    pm2 stop default
     pm2 start npm -- run start
