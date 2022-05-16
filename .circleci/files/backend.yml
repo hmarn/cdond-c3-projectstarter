@@ -35,3 +35,10 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub udapeople-${ID}
+
+Outputs:
+  WorkflowID:
+    Value: !GetAtt EC2Instance.PublicIp
+    Description: PublicIP for Backend
+    Export:
+      Name: !Sub udapeople-${ID}

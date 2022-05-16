@@ -177,11 +177,19 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory
           command: |
+            echo "List All CloudFormation Exports:"
             aws cloudformation \
-            list-exports --query "Exports[?Name==\`PipelineID\`].Value" \
-            --no-paginate --output text > ~/project/.circleci/ansible/inventory.txt
-            pwd
+            list-exports
+            echo "End!!!"
+
+            aws cloudformation \
+            list-exports \
+            --query "Exports[?Name==\`udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}\`].Value" \
+            --output text >> ~/project/.circleci/ansible/inventory.txt
+
+            echo "List Inventory:"
             cat ~/project/.circleci/ansible/inventory.txt
+            echo "End!!!"
       - run:
           name: Installing Tar
           command: yum install -y tar gzip
@@ -195,47 +203,37 @@ jobs:
 
   configure-infrastructure:
     docker:
-      - image: cimg/python:3.8
+      - image: cimg/python:3.10.4
     steps:
       - checkout
       - add_ssh_keys:
           fingerprints:
             - "b6:c0:27:6d:7d:d9:81:53:cf:bc:d3:b7:da:f4:fe:11"
-      - run:
-          name: Installing Tar
-          command: |
-              yum install -y tar gzip
       - attach_workspace:
           at: ~/
       - run:
           name: Install Ansible
           command: |
-              # yum -y install python3.8 python3.8-pip
-              # python3 --version
-              # pip3 install ansible
-              # ansible --version | grep "python3 version"
-
-              # python3 --version
-              # sudo apt install python3.8-pip
-              # which pip3
-
-
-              apk add --no-cache \
-                python3 \
-                py3-pip \
-              && pip3 install --upgrade pip \
-              && pip3 install \
-                    awscli \
-              && rm -rf /var/cache/apk/*
-              apk add --update ansible
-
+              python --version
+              sudo add-apt-repository universe
+              sudo apt-get update
+              sudo apt-get install python3-pip
+              pip3 --version
+              sudo pip3 install ansible
+              ansible --version | grep "python version"
       - run:
           name: Configure server
           command: |
               pwd
-              cat ~/project/.circleci/ansible/inventory.txt
               cd ~/project/.circleci/ansible/
+              ls
+              echo "Inventory:"
+              cat inventory.txt
+              echo "End!!!"
+              
               ansible-playbook -i inventory.txt configure-server.yml
+
+              echo "Configure server is done!!!"
       - destroy-environment
       # - notify_slack_error
       # - notify_slack_pass
@@ -455,7 +453,7 @@ workflows:
       # - analyze-backend:
       #     requires: [build-backend]
       - deploy-infrastructure:
-          # requires: [test-frontend, test-backend, analyze-frontend, analyze-backend]
+          requires: [build-frontend, build-backend]
           filters:
             branches:
               only: [test-feature-branch]
