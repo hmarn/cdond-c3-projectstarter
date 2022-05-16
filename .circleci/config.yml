@@ -195,7 +195,7 @@ jobs:
 
   configure-infrastructure:
     docker:
-      - image: amazon/aws-cli
+      - image: cimg/python:3.8
     steps:
       - checkout
       - add_ssh_keys:
@@ -210,9 +210,25 @@ jobs:
       - run:
           name: Install Ansible
           command: |
-              yum -y install python3 python3-pip
-              pip3 install ansible
-              ansible --version | grep "python version"
+              # yum -y install python3.8 python3.8-pip
+              # python3 --version
+              # pip3 install ansible
+              # ansible --version | grep "python3 version"
+
+              # python3 --version
+              # sudo apt install python3.8-pip
+              # which pip3
+
+
+              apk add --no-cache \
+                python3 \
+                py3-pip \
+              && pip3 install --upgrade pip \
+              && pip3 install \
+                    awscli \
+              && rm -rf /var/cache/apk/*
+              apk add --update ansible
+
       - run:
           name: Configure server
           command: |
@@ -220,7 +236,7 @@ jobs:
               cat ~/project/.circleci/ansible/inventory.txt
               cd ~/project/.circleci/ansible/
               ansible-playbook -i inventory.txt configure-server.yml
-      - destroy-environment    
+      - destroy-environment
       # - notify_slack_error
       # - notify_slack_pass
       # Here's where you will add some code to rollback on failure  
@@ -320,6 +336,7 @@ jobs:
               yum -y install python3 python3-pip
               pip3 install ansible
               ansible --version | grep "python version"
+              
       - run:
           name: Installing NodeJS
           command: |
@@ -429,26 +446,26 @@ workflows:
     jobs:
       - build-frontend
       - build-backend
-      - test-frontend:
-          requires: [build-frontend]
-      - test-backend:
-          requires: [build-backend]
-      - analyze-frontend:
-          requires: [build-frontend]
-      - analyze-backend:
-          requires: [build-backend]
+      # - test-frontend:
+      #     requires: [build-frontend]
+      # - test-backend:
+      #     requires: [build-backend]
+      # - analyze-frontend:
+      #     requires: [build-frontend]
+      # - analyze-backend:
+      #     requires: [build-backend]
       - deploy-infrastructure:
-          requires: [test-frontend, test-backend, analyze-frontend, analyze-backend]
+          # requires: [test-frontend, test-backend, analyze-frontend, analyze-backend]
           filters:
             branches:
               only: [test-feature-branch]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: [configure-infrastructure]
-      - deploy-frontend:
-          requires: [run-migrations]
-      - deploy-backend:
-          requires: [run-migrations]
-      - smoke-test:
-          requires: [deploy-frontend, deploy-backend]
+      # - run-migrations:
+      #     requires: [configure-infrastructure]
+      # - deploy-frontend:
+      #     requires: [run-migrations]
+      # - deploy-backend:
+      #     requires: [run-migrations]
+      # - smoke-test:
+      #     requires: [deploy-frontend, deploy-backend]
