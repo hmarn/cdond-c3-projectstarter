@@ -345,8 +345,6 @@ jobs:
             sudo bash /tmp/nodesource_setup.sh
             sudo apt install nodejs
             node -v
-            # yum -y install nodejs
-            
       - run:
           name: Deploy backend objects
           command: |
@@ -354,15 +352,14 @@ jobs:
             npm i
             npm run build
             cd ..
-            # tar -C backend -czvf backend.tar.gz .
+            tar -C backend -czvf backend.tar.gz .
             
             cd ~/project/.circleci/ansible/
-            pwd
-            ls
             echo "Inventory:"
             cat inventory.txt
             echo "***** \n"
-            # ansible-playbook -i inventory.txt deploy-backend.yml
+
+            ansible-playbook -i inventory.txt deploy-backend.yml
       - destroy-environment
 
   smoke-test:
