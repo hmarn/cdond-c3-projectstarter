@@ -7,12 +7,13 @@
 - name: Copy backend compiled files
   become: true
   copy:
-    src: /root/project/backend.tar.gz
+    src: ~/project/backend.tar.gz
     dest: /home/ubuntu/backend.tar.gz
 
 - name: Executing node
   shell: |
     cd /home/ubuntu/
+    pwd
     tar xzvf backend.tar.gz
     cd backend/dist
     pm2 stop default

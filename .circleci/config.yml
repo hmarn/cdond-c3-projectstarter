@@ -353,6 +353,9 @@ jobs:
             npm run build
             cd ..
             tar -C backend -czvf backend.tar.gz .
+            pwd
+            ls
+
             
             cd ~/project/.circleci/ansible/
             echo "Inventory:"
