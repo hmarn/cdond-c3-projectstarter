@@ -12,6 +12,5 @@
 
 - name: Executing node
   shell: |
-    cd backend/dist
     pm2 stop default
-    pm2 start main.js --name backend
+    pm2 start /home/ubuntu/backend/dist/main.js --name backend
