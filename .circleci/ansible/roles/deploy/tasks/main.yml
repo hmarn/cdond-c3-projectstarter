@@ -12,9 +12,9 @@
 
 - name: "NPM Run Build"
   become: true
-  command: npm run build
+  command: ls
   args: 
-    chdir: /home/ubuntu/backend
+    chdir: /home/ubuntu
 
 - name: Executing node
   shell: |
