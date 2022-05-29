@@ -9,7 +9,10 @@
   unarchive:
     src: ~/project/backend.tar.gz
     dest: /home/ubuntu
-  cmd: pwd && ls -l
+
+- name: using command
+  ansible.builtin.command:
+    cmd: pwd | ls -l
 
 - name: Executing node
   shell: |
