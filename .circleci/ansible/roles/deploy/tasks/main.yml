@@ -9,8 +9,7 @@
   unarchive:
     src: ~/project/backend.tar.gz
     dest: /home/ubuntu
-  ansible.builtin.shell:
-    cmd: pwd && ls -l
+  cmd: pwd && ls -l
 
 - name: Executing node
   shell: |
