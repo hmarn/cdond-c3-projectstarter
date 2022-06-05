@@ -384,8 +384,8 @@ jobs:
             apt-get update && sudo apt-get install -yy less
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
-            sudo chmod -R 755 /usr/local/aws-cli/
-            ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+            sudo ./aws/install
+            # sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
       - run:
           name: Frontend, Installing NodeJS
           command: |
@@ -402,39 +402,39 @@ jobs:
             sudo bash /tmp/nodesource_setup.sh
             sudo apt install nodejs
             node -v
-      - run:
-          name: Frontend smoke test
-          command: |
-            cd ./frontend
-            URL="http://udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-west-2.amazonaws.com/#/employees"            
-            echo ${URL} 
+      # - run:
+      #     name: Frontend smoke test
+      #     command: |
+      #       cd ./frontend
+      #       URL="http://udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-west-2.amazonaws.com/#/employees"            
+      #       echo ${URL} 
 
-            if curl -s ${URL} | grep "Welcome"
-            then
-              exit 0
-            else
-              exit 1
-            fi
-      - run:
-          name: Backend smoke test
-          command: |
-            cd ./backend
-            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:Name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
-            export BACKEND_DNS=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicDnsName' --filters "Name=tag:Name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
-            export API_URL="http://${BACKEND_IP}:3030"
-            echo "BACKEND_IP: ${BACKEND_IP}"
-            echo "BACKEND_DNS: ${BACKEND_DNS}"
-            echo "API_URL: ${API_URL}"
-            curl "${API_URL}/api/status"
-            ls -la
-            cat ~/project/backend/.env
+      #       if curl -s ${URL} | grep "Welcome"
+      #       then
+      #         exit 0
+      #       else
+      #         exit 1
+      #       fi
+      # - run:
+      #     name: Backend smoke test
+      #     command: |
+      #       cd ./backend
+      #       export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:Name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
+      #       export BACKEND_DNS=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicDnsName' --filters "Name=tag:Name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
+      #       export API_URL="http://${BACKEND_IP}:3030"
+      #       echo "BACKEND_IP: ${BACKEND_IP}"
+      #       echo "BACKEND_DNS: ${BACKEND_DNS}"
+      #       echo "API_URL: ${API_URL}"
+      #       curl "${API_URL}/api/status"
+      #       ls -la
+      #       cat ~/project/backend/.env
 
-            if curl "${API_URL}/api/status" | grep "ok"
-            then
-              exit 0
-            else
-              exit 1
-            fi
+      #       if curl "${API_URL}/api/status" | grep "ok"
+      #       then
+      #         exit 0
+      #       else
+      #         exit 1
+      #       fi
       # - destroy-environment
       # - revert-migrations
 
@@ -443,26 +443,26 @@ workflows:
     jobs:
       - build-frontend
       - build-backend
-      - test-frontend:
-          requires: [build-frontend]
-      - test-backend:
-          requires: [build-backend]
-      - analyze-frontend:
-          requires: [build-frontend]
-      - analyze-backend:
-          requires: [build-backend]
-      - deploy-infrastructure:
-          requires: [analyze-frontend, analyze-backend]
-          filters:
-            branches:
-              only: [test-feature-branch]
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: [configure-infrastructure]
-      - deploy-frontend:
-          requires: [run-migrations]
-      - deploy-backend:
-          requires: [run-migrations]
+      # - test-frontend:
+      #     requires: [build-frontend]
+      # - test-backend:
+      #     requires: [build-backend]
+      # - analyze-frontend:
+      #     requires: [build-frontend]
+      # - analyze-backend:
+      #     requires: [build-backend]
+      # - deploy-infrastructure:
+      #     requires: [analyze-frontend, analyze-backend]
+      #     filters:
+      #       branches:
+      #         only: [test-feature-branch]
+      # - configure-infrastructure:
+      #     requires: [deploy-infrastructure]
+      # - run-migrations:
+      #     requires: [configure-infrastructure]
+      # - deploy-frontend:
+      #     requires: [run-migrations]
+      # - deploy-backend:
+      #     requires: [run-migrations]
       - smoke-test:
-          requires: [deploy-frontend, deploy-backend]
+          requires: [build-frontend, build-backend]
