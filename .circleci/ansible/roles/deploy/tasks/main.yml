@@ -12,11 +12,11 @@
 
 - name: "NPM Run Build"
   become: true
-  command: ls
+  command: npm run build
   args: 
-    chdir: /home/ubuntu
+    chdir: /home/ubuntu/backend
 
 - name: Executing node
   shell: |
     cd /home/ubuntu/backend
-    pm2 start npm --name backend -- start
+    pm2 start npm --name backend -- run start
