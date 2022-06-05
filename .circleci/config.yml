@@ -274,13 +274,6 @@ jobs:
           command: |
             yum install -y tar gzip
             yum install -y unzip        
-      # - run:
-      #     name: Installing AWS CLI
-      #     command: |
-      #       apt-get update && sudo apt-get install -yy less
-      #       curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-      #       unzip awscliv2.zip
-      #       ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
       - run:
           name: Installing NodeJS
           command: |
@@ -349,11 +342,7 @@ jobs:
             npm run build
             cd ..
             tar -C backend -czvf backend.tar.gz .
-            pwd
-            ls
-            ls ./backend
-
-            cd ~/project/.circleci/ansible/
+            cd .circleci/ansible/
             echo "Inventory:"
             cat inventory.txt
             echo "***** \n"
