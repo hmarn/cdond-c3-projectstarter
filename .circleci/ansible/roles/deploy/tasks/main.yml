@@ -5,8 +5,8 @@
     sudo npm install -g npm@latest
 
 - name: Copy backend dist files to remote server
-  copy:
-    src: /home/circleci/project/backend
+  unarchive:
+    src: /home/circleci/project/backend.tar.gz
     dest: /home/ubuntu
 
 - name: Install Node modules
