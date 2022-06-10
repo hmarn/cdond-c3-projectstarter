@@ -22,6 +22,12 @@
     state: latest
     update_cache: yes
 
+- name: copying file with playbook
+  become: yes 
+  copy:
+    src: readme.md
+    dest: /home/ubuntu/
+
 - name: "install pm2"
   become: yes
   npm:

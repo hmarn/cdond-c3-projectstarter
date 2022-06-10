@@ -342,12 +342,13 @@ jobs:
             npm run build
             cd ..
             tar -C backend -czvf backend.tar.gz .
-            cd .circleci/ansible/
+            
+            pwd
             echo "Inventory:"
-            cat inventory.txt
+            cat .circleci/ansible/inventory.txt
             echo "***** \n"
 
-            ansible-playbook -i inventory.txt deploy-backend.yml
+            ansible-playbook -i .circleci/ansible/inventory.txt deploy-backend.yml
       - destroy-environment
 
   smoke-test:
