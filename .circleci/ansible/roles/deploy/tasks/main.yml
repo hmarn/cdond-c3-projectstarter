@@ -6,7 +6,7 @@
 
 - name: Copy backend dist files to remote server
   copy:
-    src: /project/backend
+    src: /home/circleci/project/backend
     dest: /home/ubuntu
 
 - name: Install Node modules

@@ -344,12 +344,13 @@ jobs:
             tar -C backend -czvf backend.tar.gz .
             
             pwd
+            cd .circleci/ansible/
             echo "Inventory:"
-            cat .circleci/ansible/inventory.txt
+            cat inventory.txt
             echo "***** \n"
 
-            ansible-playbook -i .circleci/ansible/inventory.txt deploy-backend.yml
-      - destroy-environment
+            ansible-playbook -i inventory.txt deploy-backend.yml
+      # - destroy-environment
 
   smoke-test:
     docker:
@@ -449,11 +450,13 @@ workflows:
               only: [test-feature-branch]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: [configure-infrastructure]
-      - deploy-frontend:
-          requires: [run-migrations]
       - deploy-backend:
-          requires: [run-migrations]
-      - smoke-test:
-          requires: [deploy-frontend, deploy-backend]
+          requires: [configure-infrastructure]
+      # - run-migrations:
+      #     requires: [configure-infrastructure]
+      # - deploy-frontend:
+      #     requires: [run-migrations]
+      # - deploy-backend
+          # requires: [run-migrations]
+      # - smoke-test:
+      #     requires: [deploy-frontend, deploy-backend]
