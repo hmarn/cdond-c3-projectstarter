@@ -10,15 +10,10 @@
     src: /home/circleci/project/backend.tar.gz
     dest: /home/ubuntu
 
-- name: Creates directory
-  file:
-    path: ~/web
-    state: directory
-
 - name: Unarchieve directory
   unarchive:
     src: /home/ubuntu/backend.tar.gz
-    dest: ~/web
+    dest: /home/ubuntu/
     remote_src: True
     
 # - name: Install Node modules
