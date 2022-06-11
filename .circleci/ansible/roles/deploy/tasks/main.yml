@@ -1,8 +1,8 @@
 ---
-- name: Update npm
-  become: yes
-  shell:
-    sudo npm install -g npm@latest
+# - name: Update npm
+#   become: yes
+#   shell:
+#     sudo npm install -g npm@latest
 
 - name: Copy backend dist files to remote server
   unarchive:
