@@ -5,8 +5,8 @@
 #     sudo npm install -g npm@latest
 
 - name: Copy backend tar files to remote server
-  become: true
-  copy:
+  become: true    # Remeber to include this, otherwise can't ssh remote server
+  unarchive:
     src: /home/circleci/project/backend.tar.gz
     dest: /home/ubuntu
 
