@@ -1,6 +1,6 @@
 ---
 - name: Update npm
-  become: true
+  become: yes
   shell:
     sudo npm install -g npm@latest
 
@@ -9,18 +9,18 @@
     src: /home/circleci/project/backend.tar.gz
     dest: /home/ubuntu
 
-- name: Install Node modules
-  shell: |
-    cd /home/ubuntu/backend
-    ls -la
-    printenv
-    npm install
+# - name: Install Node modules
+#   shell: |
+#     cd /home/ubuntu/backend
+#     ls -la
+#     printenv
+#     npm install
 
-- name: building node services
-  shell: |
-    cd /home/ubuntu/backend
-    npm run build
-#     # npm run prestart:prod
+# - name: building node services
+#   shell: |
+#     cd /home/ubuntu/backend
+#     npm run build
+#     npm run prestart:prod
 
 # - name: "run migrations again"
 #   shell: |
