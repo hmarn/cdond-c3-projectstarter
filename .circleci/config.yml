@@ -344,12 +344,11 @@ jobs:
             tar -C backend -czvf backend.tar.gz .
             
             pwd
-            cd .circleci/ansible/
             echo "Inventory:"
-            cat inventory.txt
+            cat .circleci/ansible/inventory.txt
             echo "***** \n"
 
-            ansible-playbook -i inventory.txt deploy-backend.yml
+            ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml
       # - destroy-environment
 
   smoke-test:
