@@ -12,8 +12,8 @@
 
 - name: Unarchieve directory
   unarchive:
-    src: backend.tar.gz
-    dest: /home/ubuntu/backend
+    src: /home/ubuntu/backend.tar.gz
+    dest: /home/ubuntu
     remote_src: True
     
 # - name: Install Node modules
