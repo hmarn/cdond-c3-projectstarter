@@ -1,11 +1,12 @@
 ---
 # - name: Update npm
-#   become: yes
+#   become: true
 #   shell:
 #     sudo npm install -g npm@latest
 
-- name: Copy backend dist files to remote server
-  unarchive:
+- name: Copy backend tar files to remote server
+  become: true
+  copy:
     src: /home/circleci/project/backend.tar.gz
     dest: /home/ubuntu
 
