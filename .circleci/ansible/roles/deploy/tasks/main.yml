@@ -45,6 +45,6 @@
 - name: Executing node
   command: pm2 start npm --name backend -- start
   args:
-    chdir: /home/ubuntu/backend
+    chdir: /home/ubuntu/backend/dist
 
 
