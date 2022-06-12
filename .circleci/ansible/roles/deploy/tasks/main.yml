@@ -11,6 +11,7 @@
     dest: /home/ubuntu
 
 - name: Unarchieve directory
+  become: true
   unarchive:
     src: /home/ubuntu/backend.tar.gz
     dest: /home/ubuntu
