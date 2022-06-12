@@ -38,25 +38,13 @@
 
 
 - name: Install Node modules
-  command: npm install
+  command: npm install --production
   args:
     chdir: /home/ubuntu/backend
-
-- name: building node services
-  command: npm run build
-  args:
-    chdir: /home/ubuntu/backend
-
-# - name: "run migrations again"
-#   shell: |
-#     cd /home/ubuntu/backend
-#     npm run migrations
     
-# - name: Executing node
-#   become: true
-#   shell: |
-#     cd /home/ubuntu/backend 
-#     pm2 start npm --name backend -- start
-#     pm2 ls
+- name: Executing node
+  command: pm2 start npm --name backend -- start
+  args:
+    chdir: /home/ubuntu/backend
 
 
