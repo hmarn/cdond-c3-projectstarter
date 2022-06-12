@@ -15,7 +15,6 @@
   unarchive:
     src: /home/ubuntu/backend.tar.gz
     dest: /home/ubuntu
-    remote_src: True
     
 # - name: Install Node modules
 #   shell: |
