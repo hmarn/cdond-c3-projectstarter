@@ -3,26 +3,27 @@
 #   become: true
 #   shell:
 #     sudo npm install -g npm@latest
-
 - name: Copy backend tar files to remote server
   become: yes    # Remeber to include this, otherwise can't ssh remote server
   copy:           # using unarchieve can't ssh remote server
-    src: /home/circleci/project/backend.tar.gz
+    src: /home/circleci/project/backend
     dest: /home/ubuntu
 
-- name: Unarchieve directory
+# - name: Unarchieve directory
+#   become: yes
+#   unarchive:
+#     src: /home/ubuntu/backend.tar.gz
+#     dest: /home/ubuntu
+#     remote_src: True
+
+- name: Install Node modules
   become: yes
-  unarchive:
-    src: /home/ubuntu/backend.tar.gz
-    dest: /home/ubuntu
-    remote_src: True
-    
-# - name: Install Node modules
-#   shell: |
-#     cd /home/ubuntu/backend
-#     ls -la
-#     printenv
-#     npm install
+  shell: |
+    cd /home/ubuntu/backend
+    ls -la
+    printenv
+    npm install
+    npm run build
 
 # - name: building node services
 #   shell: |
