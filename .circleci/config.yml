@@ -317,6 +317,10 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
+          name: installing ssh client
+          command: |
+            sudo apt install openssh-client
+      - run:
           name: Install Ansible
           command: |
               python --version
