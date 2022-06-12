@@ -2,14 +2,14 @@
 - name: "Create app folder"
   become: true
   file:
-    path: /home/ubuntu/app
+    path: /home/ubuntu/backend
     state: directory
 
 - name: "Copy backend build to server"
   become: true
   unarchive:
     src: /home/circleci/project/backend.tar.gz
-    dest: /home/ubuntu/app/
+    dest: /home/ubuntu/backend/
     owner: ubuntu
 
 
@@ -40,12 +40,12 @@
 - name: Install Node modules
   command: npm install
   args:
-    chdir: /home/ubuntu/app/backend
+    chdir: /home/ubuntu/backend
 
 - name: building node services
   command: npm run build
   args:
-    chdir: /home/ubuntu/app/backend
+    chdir: /home/ubuntu/backend
 
 # - name: "run migrations again"
 #   shell: |
