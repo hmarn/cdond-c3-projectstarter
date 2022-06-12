@@ -1,21 +1,41 @@
 ---
-# - name: Update npm
-#   become: true
-#   shell:
-#     sudo npm install -g npm@latest
-- name: Copy backend tar files to remote server
-  become: yes    # Remeber to include this, otherwise can't ssh remote server
-  copy:           # using unarchieve can't ssh remote server
-    src: /home/circleci/project/backend.tar.gz
-    dest: /home/ubuntu
+- name: "Create app folder"
+  become: true
+  file:
+    path: /home/ubuntu/app
+    state: directory
 
-- name: Unarchieve directory
-  become_method: sudo
-  become: yes
+- name: "Copy backend build to server"
+  become: true
   unarchive:
-    src: /home/ubuntu/backend.tar.gz
-    dest: /home/ubuntu
-    remote_src: True
+    src: /home/circleci/project/backend.tar.gz
+    dest: /home/ubuntu/app/
+    owner: ubuntu
+
+
+# My steps
+# - name: Copy backend tar files to remote server
+#   become: yes    # Remeber to include this, otherwise can't ssh remote server
+#   copy:           # using unarchieve can't ssh remote server
+#     src: /home/circleci/project/backend.tar.gz
+#     dest: /home/ubuntu
+
+# - name: Print env variable
+#   shell: ls -al
+#   register: print_result
+
+# - name: print message
+#   debug:
+#     msg: "{{ print_result.stdout_lines }}"
+    
+# - name: Unarchieve directory
+#   become_method: sudo
+#   become: yes
+#   unarchive:
+#     src: /home/ubuntu/backend.tar.gz
+#     dest: /home/ubuntu
+#     remote_src: True
+
 
 # - name: Install Node modules
 #   become_method: sudo
