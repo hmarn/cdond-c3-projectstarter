@@ -51,8 +51,11 @@
     export TYPEORM_USERNAME="{{ lookup('env', 'TYPEORM_USERNAME') }}"
     export TYPEORM_PASSWORD="{{ lookup('env', 'TYPEORM_PASSWORD') }}"
     export TYPEORM_DATABASE="{{ lookup('env', 'TYPEORM_DATABASE') }}"
-    pm2 start npm --name backend -- start
+    pm2 start main.js --name backend
   args:
-    chdir: /home/ubuntu/backend
+    chdir: /home/ubuntu/backend/dist
 
-
+- name: "Set pm2 start as service"
+  become: yes
+  shell: |
+    env PATH=$PATH:/usr/local/bin pm2 startup -u ubuntu
