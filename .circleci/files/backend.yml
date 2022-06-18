@@ -29,7 +29,7 @@ Resources:
       SecurityGroups:
         - Ref: InstanceSecurityGroup
       KeyName: uswest2-project-udacity
-      ImageId: ami-0cb4e786f15603b0d
+      ImageId: ami-0ddf424f81ddb0720
       Tags:
         - Key: Name
           Value: !Sub udapeople-${ID}
