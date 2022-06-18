@@ -445,9 +445,6 @@ jobs:
             echo "BACKEND_IP: ${BACKEND_IP}"
             echo "BACKEND_DNS: ${BACKEND_DNS}"
             echo "API_URL: ${API_URL}"
-            curl "${API_URL}/api/status"
-            ls -la
-            cat ~/project/backend/.env
 
             if curl "${API_URL}/api/status" | grep "ok"
             then
