@@ -12,38 +12,14 @@
     dest: /home/ubuntu/backend/
     owner: ubuntu
 
-
-# My steps
-# - name: Copy backend tar files to remote server
-#   become: yes    # Remeber to include this, otherwise can't ssh remote server
-#   copy:           # using unarchieve can't ssh remote server
-#     src: /home/circleci/project/backend.tar.gz
-#     dest: /home/ubuntu
-
-# - name: Print env variable
-#   shell: ls -al
-#   register: print_result
-
-# - name: print message
-#   debug:
-#     msg: "{{ print_result.stdout_lines }}"
-    
-# - name: Unarchieve directory
-#   become_method: sudo
-#   become: yes
-#   unarchive:
-#     src: /home/ubuntu/backend.tar.gz
-#     dest: /home/ubuntu
-#     remote_src: True
-
-
 - name: Install Node modules
   command: npm install --production
   args:
     chdir: /home/ubuntu/backend
     
 - name: Executing node
-  shell: | 
+  become: true
+  shell: |
     export ENVIRONMENT=production
     export NODE_ENV=production
     export TYPEORM_HOST="{{ lookup('env', 'TYPEORM_HOST') }}"
@@ -54,8 +30,3 @@
     pm2 start npm --name "backend" -- run start
   args:
     chdir: /home/ubuntu/backend
-
-- name: "Set pm2 start as service"
-  become: yes
-  shell: |
-    env PATH=$PATH:/usr/local/bin pm2 startup -u ubuntu
