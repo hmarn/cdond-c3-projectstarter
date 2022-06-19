@@ -464,10 +464,9 @@ jobs:
           command: |
             aws cloudformation deploy \
             --template-file .circleci/files/cloudfront.yml \
-            --stack-name PromoteStack \
+            --stack-name cloudfront-stack-${CIRCLE_WORKFLOW_ID} \
             --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
-            OutputName="PromotedWorkflowID" \
-            --tags project=udapeople 
+            --tags project=udapeople
 
   cleanup:
     docker:
@@ -483,7 +482,7 @@ jobs:
                     --no-paginate --output text)
             echo OldWorkflowID: "${OldWorkflowID}"
             echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
-            # Fetch all stack names       
+            # Fetch all stack names
             export STACKS=($(aws cloudformation list-stacks \
                           --query "StackSummaries[*].StackName" \
                           --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
@@ -495,6 +494,7 @@ jobs:
               aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
               aws cloudformation delete-stack --stack-name "stack-create-frontend-${OldWorkflowID}"
               aws cloudformation delete-stack --stack-name "stack-create-backend-${OldWorkflowID}"
+              aws cloudformation delete-stack --stack-name "cloudfront-stack-${OldWorkflowID}"
             else
               echo "Not Found OldWorkflowID!!"
             fi
@@ -529,3 +529,5 @@ workflows:
           requires: [deploy-frontend, deploy-backend]
       - cloudfront-update:
           requires: [smoke-test]
+      - cleanup:
+          requires: [cloudfront-update]
