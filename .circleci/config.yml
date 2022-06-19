@@ -493,8 +493,8 @@ jobs:
               echo "Found OldWorkflowID!!"
 
               aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
-              # aws cloudformation delete-stack --stack-name "stack-create-frontend-${OldWorkflowID}"
-              # aws cloudformation delete-stack --stack-name "stack-create-backend-${OldWorkflowID}"
+              aws cloudformation delete-stack --stack-name "stack-create-frontend-${OldWorkflowID}"
+              aws cloudformation delete-stack --stack-name "stack-create-backend-${OldWorkflowID}"
             else
               echo "Not Found OldWorkflowID!!"
             fi
@@ -529,5 +529,3 @@ workflows:
           requires: [deploy-frontend, deploy-backend]
       - cloudfront-update:
           requires: [smoke-test]
-      - cleanup:
-          requires: [cloudfront-update]
