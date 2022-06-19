@@ -11,6 +11,7 @@ commands:
             name: Destroy environments
             when: on_fail
             command: |
+              aws s3 rm s3://udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} --recursive
               aws cloudformation delete-stack --stack-name stack-create-backend-${CIRCLE_WORKFLOW_ID:0:7}
               aws cloudformation delete-stack --stack-name stack-create-frontend-${CIRCLE_WORKFLOW_ID:0:7}
 
@@ -199,16 +200,6 @@ jobs:
   configure-infrastructure:
     docker:
       - image: cimg/python:3.10.4
-        environment:
-            TYPEORM_CONNECTION: $TYPEORM_CONNECTION
-            TYPEORM_ENTITIES: $TYPEORM_ENTITIES
-            TYPEORM_HOST: $TYPEORM_HOST
-            TYPEORM_USERNAME: $TYPEORM_USERNAME
-            TYPEORM_PASSWORD: $TYPEORM_PASSWORD
-            TYPEORM_DATABASE: $TYPEORM_DATABASE
-            TYPEORM_MIGRATIONS: $TYPEORM_MIGRATIONS
-            TYPEORM_MIGRATIONS_DIR: "{{ lookup('env', 'TYPEORM_MIGRATIONS_DIR')}}"
-
     steps:
       - checkout
       - add_ssh_keys:
@@ -235,8 +226,8 @@ jobs:
               echo "Inventory:"
               cat inventory.txt
               echo "***** \n"
-              
-              ansible-playbook -i inventory.txt configure-server.yml
+              exit 1
+              # ansible-playbook -i inventory.txt configure-server.yml
       - destroy-environment
       # - notify_slack_error
       # - notify_slack_pass
@@ -431,7 +422,7 @@ jobs:
 
             if curl -s ${URL} | grep "Welcome"
             then
-              exit 0
+              exit 1
             else
               exit 1
             fi
@@ -452,7 +443,7 @@ jobs:
             else
               exit 1
             fi
-      # - destroy-environment
+      - destroy-environment
       # - revert-migrations
 
 workflows:
@@ -475,11 +466,11 @@ workflows:
               only: [test-feature-branch]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: [configure-infrastructure]
-      - deploy-frontend:
-          requires: [run-migrations]
-      - deploy-backend:
-          requires: [run-migrations]
-      - smoke-test:
-          requires: [deploy-frontend, deploy-backend]
+      # - run-migrations:
+      #     requires: [configure-infrastructure]
+      # - deploy-frontend:
+      #     requires: [run-migrations]
+      # - deploy-backend:
+      #     requires: [run-migrations]
+      # - smoke-test:
+      #     requires: [deploy-frontend, deploy-backend]
