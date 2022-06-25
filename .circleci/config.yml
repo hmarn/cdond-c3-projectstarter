@@ -462,10 +462,11 @@ jobs:
       - run:
           name: Promoting - Execute cloudfront.yml
           command: |
-            aws cloudformation deploy \
+            aws cloudformation update-stack \
             --template-file .circleci/files/cloudfront.yml \
             --stack-name cloudfront-stack-${CIRCLE_WORKFLOW_ID:0:7} \
-            --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}"
+            --parameters ParameterKey=WorkflowID,ParameterValue=$CIRCLE_WORKFLOW_ID,UsePreviousValue=false \
+            --tags project=udapeople
 
   cleanup:
     docker:
