@@ -1,7 +1,6 @@
 version: 2.1
 
-orbs: 
-  aws-cli: circleci/aws-cli@2.1.0
+orbs:
   slack: circleci/slack@4.1
 
 commands:
@@ -195,8 +194,8 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
       - destroy-environment
-      # - notify_slack_error
-      # - notify_slack_pass
+      - notify_slack_error
+      - notify_slack_pass
 
   configure-infrastructure:
     docker:
@@ -485,7 +484,7 @@ jobs:
             export STACKS=($(aws cloudformation list-stacks \
                           --query "StackSummaries[*].StackName" \
                           --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
-            echo Stack names: "${STACKS[@]}"  
+  
             if [[ ! -z $OldWorkflowID ]]
             then
               echo "Found OldWorkflowID!!"
@@ -502,16 +501,16 @@ workflows:
     jobs:
       - build-frontend
       - build-backend
-      # - test-frontend:
-      #     requires: [build-frontend]
-      # - test-backend:
-      #     requires: [build-backend]
-      # - analyze-frontend:
-      #     requires: [build-frontend]
-      # - analyze-backend:
-      #     requires: [build-backend]
+      - test-frontend:
+          requires: [build-frontend]
+      - test-backend:
+          requires: [build-backend]
+      - analyze-frontend:
+          requires: [build-frontend]
+      - analyze-backend:
+          requires: [build-backend]
       - deploy-infrastructure:
-          requires: [build-frontend, build-backend]
+          requires: [analyze-frontend, analyze-backend]
           filters:
             branches:
               only: [test-feature-branch]
