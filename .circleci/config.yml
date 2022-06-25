@@ -465,7 +465,7 @@ jobs:
             aws cloudformation update-stack \
             --use-previous-template \
             --stack-name cloudfront-stack \
-            --parameters ParameterKey=WorkflowID,ParameterValue=$CIRCLE_WORKFLOW_ID,UsePreviousValue=false
+            --parameters ParameterKey=WorkflowID,ParameterValue=${CIRCLE_WORKFLOW_ID:0:7},UsePreviousValue=false
 
   cleanup:
     docker:
@@ -490,7 +490,7 @@ jobs:
             then
               echo "Found OldWorkflowID!!"
 
-              aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
+              aws s3 rm "s3://udapeople-frontend-${OldWorkflowID}" --recursive
               aws cloudformation delete-stack --stack-name "stack-create-frontend-${OldWorkflowID}"
               aws cloudformation delete-stack --stack-name "stack-create-backend-${OldWorkflowID}"
             else
