@@ -87,14 +87,15 @@ jobs:
       - run:
           name: Build front-end
           command: |
+            exit 1
             cd ./frontend
             sudo npm install
             npm run build
       - save_cache:
           paths: [./frontend/node_modules]
           key: frontend-build-{{ checksum "./frontend/package-lock.json" }}
-      # - notify_slack_error
-      # - notify_slack_pass
+      - notify_slack_error
+      - notify_slack_pass
 
   build-backend:
     docker:
