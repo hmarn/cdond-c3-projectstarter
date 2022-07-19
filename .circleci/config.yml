@@ -87,7 +87,6 @@ jobs:
       - run:
           name: Build front-end
           command: |
-            exit 1
             cd ./frontend
             sudo npm install
             npm run build
@@ -113,8 +112,8 @@ jobs:
       - save_cache:
           paths: [./backend/node_modules]
           key: backend-build-{{ checksum "./backend/package-lock.json" }}
-      # - notify_slack_error
-      # - notify_slack_pass
+      - notify_slack_error
+      - notify_slack_pass
 
   test-frontend:
     docker:
@@ -129,8 +128,8 @@ jobs:
             cd ./frontend
             sudo npm install
             npm run test
-      # - notify_slack_error
-      # - notify_slack_pass
+      - notify_slack_error
+      - notify_slack_pass
          
   test-backend:
     docker:
@@ -145,8 +144,8 @@ jobs:
             cd ./backend
             sudo npm install
             npm run test
-      # - notify_slack_error
-      # - notify_slack_pass
+      - notify_slack_error
+      - notify_slack_pass
 
   analyze-frontend:
     docker:
@@ -162,8 +161,8 @@ jobs:
             sudo npm install
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
-      # - notify_slack_error
-      # - notify_slack_pass
+      - notify_slack_error
+      - notify_slack_pass
 
   analyze-backend:
     docker:
@@ -179,8 +178,8 @@ jobs:
             sudo npm install
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
-      # - notify_slack_error
-      # - notify_slack_pass
+      - notify_slack_error
+      - notify_slack_pass
 
   deploy-infrastructure:
     docker:
@@ -222,8 +221,8 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
       - destroy-environment
-      # # - notify_slack_error
-      # - notify_slack_pass
+      - notify_slack_error
+      - notify_slack_pass
 
   configure-infrastructure:
     docker:
@@ -265,8 +264,8 @@ jobs:
               
               ansible-playbook -i inventory.txt configure-server.yml
       - destroy-environment
-      # - notify_slack_error
-      # - notify_slack_pass
+      - notify_slack_error
+      - notify_slack_pass
   
   run-migrations:
     docker:
