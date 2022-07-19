@@ -1,0 +1,49 @@
+Description: >
+  UdaPeople prometheus config stack.
+
+Parameters:
+  ID:
+    Description: Unique identifier.
+    Type: String
+
+Resources:
+  # InstanceSecurityGroup:
+  #   Type: AWS::EC2::SecurityGroup
+  #   Properties:
+  #     GroupName: 'prometheus-group'
+  #     GroupDescription: Allow port 22, 9093, 9090 and 9100.
+  #     SecurityGroupIngress:
+  #       - IpProtocol: tcp
+  #         FromPort: '22'
+  #         ToPort: '22'
+  #         CidrIp: 0.0.0.0/0
+  #       - IpProtocol: tcp
+  #         FromPort: '9093'
+  #         ToPort: '9093'
+  #         CidrIp: 0.0.0.0/0
+  #       - IpProtocol: tcp
+  #         FromPort: '9090'
+  #         ToPort: '9090'
+  #         CidrIp: 0.0.0.0/0
+  #       - IpProtocol: tcp
+  #         FromPort: '9100'
+  #         ToPort: '9100'
+  #         CidrIp: 0.0.0.0/0
+
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      SecurityGroups: ['prometheus']
+      KeyName: prometheus
+      ImageId: ami-0ddf424f81ddb0720
+      Tags:
+        - Key: Name
+          Value: !Sub prometheus-${ID}
+
+Outputs:
+  WorkflowID:
+    Value: !GetAtt EC2Instance.PublicIp
+    Description: PublicIP for Prometheus ${ID}
+    Export:
+      Name: !Sub prometheus-${ID}
