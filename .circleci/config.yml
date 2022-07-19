@@ -221,8 +221,6 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
       - destroy-environment
-      - notify_slack_error
-      - notify_slack_pass
 
   configure-infrastructure:
     docker:
@@ -264,8 +262,6 @@ jobs:
               
               ansible-playbook -i inventory.txt configure-server.yml
       - destroy-environment
-      - notify_slack_error
-      - notify_slack_pass
   
   run-migrations:
     docker:
@@ -288,6 +284,7 @@ jobs:
               then
                   curl https://kvdb.io/YBMGekKxb6oqKJi39EV2vR/migration-${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
               fi
+      - destroy-environment
 
   deploy-frontend:
     docker:
