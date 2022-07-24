@@ -509,9 +509,9 @@ jobs:
             then
               echo "Found OldWorkflowID!!"
 
-              # aws s3 rm "s3://udapeople-frontend-${OldWorkflowID}" --recursive
-              # aws cloudformation delete-stack --stack-name "stack-create-frontend-${OldWorkflowID}"
-              # aws cloudformation delete-stack --stack-name "stack-create-backend-${OldWorkflowID}"
+              aws s3 rm "s3://udapeople-frontend-${OldWorkflowID}" --recursive
+              aws cloudformation delete-stack --stack-name "stack-create-frontend-${OldWorkflowID}"
+              aws cloudformation delete-stack --stack-name "stack-create-backend-${OldWorkflowID}"
             else
               echo "Not Found OldWorkflowID!!"
             fi
