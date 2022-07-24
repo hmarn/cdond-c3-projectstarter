@@ -288,24 +288,21 @@ jobs:
 
   deploy-frontend:
     docker:
-      - image: amazon/aws-cli
+      - image: cimg/node:12.16
     steps:
       - checkout
       - restore_cache:
-          key: frontend-build-{{ checksum "./frontend/package-lock.json" }}    
-      - run:
-          name: Installing Tar
-          command: |
-            yum install -y tar gzip
-            yum install -y unzip        
-      - run:
-          name: Installing NodeJS
-          command: |
-            cd ./frontend
-            curl -sL https://rpm.nodesource.com/setup_10.x | bash -
-            yum -y install nodejs
+          key: frontend-build-{{ checksum "./frontend/package-lock.json" }}
       - attach_workspace:
           at: ~/
+      - run:
+          name: Installing AWS CLI
+          command: |
+            apt-get update && sudo apt-get install -yy less
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+            aws --version
       - run:
           name: Get backend url
           workding_directory: ./frontend
