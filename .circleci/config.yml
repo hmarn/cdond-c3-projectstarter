@@ -251,15 +251,19 @@ jobs:
             sudo ./aws/install
             aws --version
       - run:
+          name: Check Backend Infra
+          command: |
+            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters Name=instance-state-name,Values=running --output text)
+            if "${BACKEND_IP}"
+            then
+              exit 0
+            else
+              exit 1
+            fi
+      - run:
           name: Configure server
           command: |
-              pwd
               cd ~/project/.circleci/ansible/
-              ls
-              echo "Inventory:"
-              cat inventory.txt
-              echo "***** \n"
-              
               ansible-playbook -i inventory.txt configure-server.yml
       - destroy-environment
   
