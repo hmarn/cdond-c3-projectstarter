@@ -220,7 +220,6 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      - destroy-environment
 
   configure-infrastructure:
     docker:
@@ -250,16 +249,6 @@ jobs:
             unzip awscliv2.zip
             sudo ./aws/install
             aws --version
-      - run:
-          name: Check Backend Infra
-          command: |
-            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters Name=tag-value,Values="udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
-            echo "BACKEND_IP: ${BACKEND_IP}"
-            if [[ "${BACKEND_IP}" ]]; then
-              exit 0
-            else
-              exit 1
-            fi
       - run:
           name: Configure server
           command: |
@@ -535,7 +524,7 @@ workflows:
       - analyze-backend:
           requires: [build-backend]
       - deploy-infrastructure:
-          requires: [build-frontend, build-backend]
+          requires: [test-frontend, test-backend, analyze-frontend, analyze-backend]
           filters:
             branches:
               only: [test-feature-branch]
